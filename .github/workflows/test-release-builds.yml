@@ -105,7 +105,7 @@ jobs:
                   export INSTALL_PREFIX=$(pwd)/dist
                   mkdir temp/build
                   cd temp/build
-                  cmake -G "Ninja" -DMSYS=TRUE -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX ${{ matrix.args }} ..
+                  cmake -G "Ninja" -march=native -mtune=native -O3 -flto=auto -DMSYS=TRUE -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX ${{ matrix.args }} ..
             - name: ninja (Windows)
               if: runner.os == 'Windows'
               shell: msys2 {0}
@@ -162,16 +162,4 @@ jobs:
                   name: ${{ matrix.artifacts_name }}
                   path: ./artifacts
                   
-            - name: Upload to NasuTek MinIO S3
-              uses: shallwefootball/s3-upload-action@master
-              env: 
-                  super_secret: ${{secrets.nte_cdn_s3_key_id}}
-              if: ${{ env.super_secret != null }}
-              id: S3
-              with:
-                  aws_key_id: ${{secrets.nte_cdn_s3_key_id}}
-                  aws_secret_access_key: ${{secrets.nte_cdn_s3_secret_access_key}}
-                  aws_bucket: pcem-dev-builds
-                  source_dir: ./artifacts
-                  destination_dir: ''
-                  endpoint:  https://cdn.ntgecdn.com:443          
+      
